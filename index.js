@@ -1,50 +1,58 @@
-import express from "express"
-import dotenv from "dotenv"
-import cors from "cors"
-import cookieParser from "cookie-parser"
+import express from "express";
+import dotenv from "dotenv";
+import cors from "cors";
+import cookieParser from "cookie-parser";
 import connectDB from "./utils/connection.js";
 
 const app = express();
 
 //config
 dotenv.config({
-    path: "./.env"
+  path: "./.env",
 });
 
 console.log("MongoDB URI:", process.env.MONGODB_URI);
 
-
 //middlewares
-app.use(express.json({limit:"16mb"}));
-app.use(express.urlencoded({
-    extended:true
-}));
+app.use(express.json({ limit: "16mb" }));
+app.use(
+  express.urlencoded({
+    extended: true,
+  })
+);
 app.use(cookieParser());
-app.use(cors({
-    origin:process.env.CORS_ORIGIN,
-    credentials:true
-}));
+app.use(
+  cors({
+    origin: process.env.CORS_ORIGIN,
+    credentials: true,
+  })
+);
 
 //connection
 connectDB()
-.then(()=>{
-    app.on("error",(error)=>{
-        console.log("Error:", error);
-        throw error;
-    })
-    app.listen(process.env.PORT||8000,()=>{
-    console.log(`Server running at port ${process.env.PORT}`);
-    })
-})
-.catch((err)=>{
-    console.log("MongoDB Connection is failed",err);  
-})
-
+  .then(() => {
+    app.on("error", (error) => {
+      console.log("Error:", error);
+      throw error;
+    });
+    app.listen(process.env.PORT || 8000, () => {
+      console.log(`Server running at port ${process.env.PORT}`);
+    });
+  })
+  .catch((err) => {
+    console.log("MongoDB Connection is failed", err);
+  });
 
 //declaration of routes
-import userRouter from "./routes/user.routes.js"
-import gadgetsRouter from "./routes/gadgets.routes.js"
+import userRouter from "./routes/user.routes.js";
+import gadgetsRouter from "./routes/gadgets.routes.js";
 
+app.use("/api/v1/user", userRouter);
+app.use("/api/v1/gadgets", gadgetsRouter);
 
-app.use("/api/v1/user",userRouter);
-app.use("/api/v1/gadgets",gadgetsRouter);
+app.get("/", (req, res) => {
+  res.status(200).json({
+    message:
+      "API is live! You can check out the routes at /api/v1/user or /api/v1/gadgets.",
+  });
+});
