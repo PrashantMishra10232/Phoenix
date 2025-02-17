@@ -21,7 +21,7 @@ const GadgetSchema = new mongoose.Schema(
       type: Date,
       default: null,
     },
-    destroyedAt: {
+    selfDestructAt: {
       type: Date,
       default: null,
     },
@@ -29,4 +29,4 @@ const GadgetSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-export const Gadgets = mongoose.model("Gadgets", GadgetSchema);
+export const Gadget = mongoose.model("Gadget", GadgetSchema);

@@ -48,23 +48,26 @@ const getAllGadgets = asyncHandler(async (req, res) => {
 });
 
 const updateDetails = asyncHandler(async (req, res) => {
-  const gadgetId = req.params;
+  const gadgetId = req.params.id;
 
   const { name, status } = req.body;
 
   const allowedStatus = ["Deployed", "Destroyed", "Decommissioned"];
-  if (status && !allowedStatus.includes(role)) {
+  if (status && !allowedStatus.includes(status)) {
     throw new ApiError(400, "Invalid Status provided");
   }
 
-  const gadget = await Gadget.findByIdAndUpdate(gadgetId, 
+  const gadget = await Gadget.findByIdAndUpdate(
+    gadgetId,
     req.body,
-    { name, status },
-  {
-    new: true,
-    runValidators: true,
-  }
-);
+    {
+      $set: { name, status },
+    },
+    {
+      new: true,
+      runValidators: true,
+    }
+  );
 
   if (!gadget) {
     throw new ApiError(404, "Gadget not found");
@@ -75,52 +78,67 @@ const updateDetails = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, gadget, "Gadget updated successfully"));
 });
 
-const deleteGadget = asyncHandler(async(req,res)=>{
-    const gadgetId = req.params;
+const deleteGadget = asyncHandler(async (req, res) => {
+  const gadgetId = req.params.id;
 
-    const gadget = await Gadget.findByIdAndUpdate(
-        gadgetId,
-        {
-            status: "Decommisioned",
-            decommisionedAt: new Date(),
-        },
-        {
-            new:true,
-            runValidators:true
-        }
-    )
-
-    if(!gadget){
-        throw new ApiError(404,"No Gadget Found")
+  const gadget = await Gadget.findByIdAndUpdate(
+    gadgetId,
+    {
+      $set : {status: "Decommissioned",
+      decommisionedAt: new Date(),}
+    },
+    {
+      new: true,
+      runValidators: true,
     }
+  );
 
-    return res.status(200
-        .json(new ApiResponse(200,gadget,"Gadget deleted successfully"))
-    )
-})
+  if (!gadget) {
+    throw new ApiError(404, "No Gadget Found");
+  }
 
-const selfDestruct = asyncHandler(async(req,res)=>{
-    const gadgetId = req.params;
+  return res.status(200)
+  .json(new ApiResponse(200, gadget, "Gadget deleted successfully")
+  );
+});
 
-    //6 digit random code
-    const confirmationCode = Math.floor(100000 + Math.random()*900000).toString();
+const selfDestruct = asyncHandler(async (req, res) => {
+  const gadgetId = req.params.id;
 
-    const gadget = await Gadget.findByIdAndUpdate(
-        gadgetId,
-        {
-            status: "Destroyed",
-            selfDestructAt: new Date()
-        },
-        {
-            new:true,
-            runValidators:true
-        }
+  //6 digit random code
+  const confirmationCode = Math.floor(
+    100000 + Math.random() * 900000
+  ).toString();
+
+  const gadget = await Gadget.findByIdAndUpdate(
+    gadgetId,
+    {
+      $set: {status: "Destroyed",
+      selfDestructAt: new Date(),}
+    },
+    {
+      new: true,
+      runValidators: true,
+    }
+  );
+  if (!gadget) {
+    throw new ApiError(404, "Gadget not found");
+  }
+
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        { gadget, confirmationCode },
+        "Self-destruct sequence initialized"
+      )
     );
-    if(!gadget){
-        throw new ApiError(404, "Gadget not found");
-    }
-
-    return res.status(200)
-    .json(new ApiResponse(200,{gadget,confirmationCode},"Self-destruct sequence initialized"))
-})
-export { createGadget, getAllGadgets ,updateDetails,deleteGadget,selfDestruct};
+});
+export {
+  createGadget,
+  getAllGadgets,
+  updateDetails,
+  deleteGadget,
+  selfDestruct,
+};

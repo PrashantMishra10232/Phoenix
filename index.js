@@ -11,6 +11,9 @@ dotenv.config({
     path: "./.env"
 });
 
+console.log("MongoDB URI:", process.env.MONGODB_URI);
+
+
 //middlewares
 app.use(express.json({limit:"16mb"}));
 app.use(express.urlencoded({
@@ -25,7 +28,7 @@ app.use(cors({
 //connection
 connectDB()
 .then(()=>{
-    app.on("error",()=>{
+    app.on("error",(error)=>{
         console.log("Error:", error);
         throw error;
     })
@@ -34,13 +37,13 @@ connectDB()
     })
 })
 .catch((err)=>{
-    console.log(err,"MongoDB Connection is failed");  
+    console.log("MongoDB Connection is failed",err);  
 })
 
 
 //declaration of routes
-import {userRouter} from "./routes/user.routes.js"
-import {gadgetsRouter} from "./routes/gadgets.routes.js"
+import userRouter from "./routes/user.routes.js"
+import gadgetsRouter from "./routes/gadgets.routes.js"
 
 
 app.use("/api/v1/user",userRouter);

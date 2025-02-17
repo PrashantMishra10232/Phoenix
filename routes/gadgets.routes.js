@@ -10,7 +10,7 @@ router.route("/getAll").get(isAuthenticatedUser,getAllGadgets);
 
 router.route("/update/:id").patch(isAuthenticatedUser,updateDetails);
 
-router.route("delete/:id").delete(isAuthenticatedUser,deleteGadget);
+router.route("/delete/:id").delete(isAuthenticatedUser,deleteGadget);
 
 router.route("/selfDestruct/:id").post(isAuthenticatedUser,selfDestruct);
 

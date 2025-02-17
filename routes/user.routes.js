@@ -16,7 +16,7 @@ router.route("/login").post(loginUser);
 
 router.route("/refreshToken").post(isAuthenticatedUser,refreshAccessToken);
 
-router.route("logOut").post(isAuthenticatedUser,logOut);
+router.route("/logOut").post(isAuthenticatedUser,logOut);
 
 router.route("/update").patch(isAuthenticatedUser,updateUserProfile);
 
